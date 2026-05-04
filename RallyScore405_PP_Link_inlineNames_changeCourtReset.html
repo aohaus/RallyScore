@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="RallyScore">
 
-<title>RallyScore406 Auto Mode</title>
+<title>RallyScore405</title>
 <style>
   :root{
     --bg:#0b0b0c;
@@ -666,24 +666,6 @@ body.ppLinked #nameB{
 }
 body.ppLinked .winDots{flex:0 0 auto;}
 
-
-
-/* --- Auto mode indicator (RallyScore406_autoMode) --- */
-.modeBadge{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:6px 10px;border-radius:999px;
-  background:rgba(34,197,94,.14);border:1px solid rgba(34,197,94,.38);
-  color:#d1fae5;font-size:12px;font-weight:900;
-}
-.modeBadge.standalone{background:rgba(148,163,184,.14);border-color:rgba(148,163,184,.35);color:#e2e8f0}
-.modeSummary{display:flex;flex-direction:column;gap:6px}
-.modeSummary .modeLine{font-weight:900;color:#e5e7eb}
-.modeSummary .modeSub{font-size:12px;color:#94a3b8;line-height:1.45}
-body.ppLinked #inNameA,
-body.ppLinked #inNameB{opacity:.65;cursor:not-allowed}
-body.ppLinked .pairplayReadonlyNote{display:block}
-.pairplayReadonlyNote{display:none;font-size:12px;color:#94a3b8;margin-top:8px;line-height:1.4}
-
 </style>
 </head>
 <body>
@@ -713,7 +695,7 @@ body.ppLinked .pairplayReadonlyNote{display:block}
     </div>
   </div>
 
-  <div class="buildTag" id="buildTag">RallyScore406_autoMode</div>
+  <div class="buildTag" id="buildTag">RallyScore405</div>
 
   <!-- Bottom sheet -->
   <div class="overlay" id="overlay"></div>
@@ -747,17 +729,6 @@ body.ppLinked .pairplayReadonlyNote{display:block}
         Settings
       </div>
       <div class="settingsScroll" id="settingsScroll">
-        <div class="section" id="modeSection">
-          <div class="sectionHeader">MODE</div>
-          <div class="row">
-            <div class="label modeSummary">
-              <div><span id="modeBadge" class="modeBadge standalone">Standalone mode</span></div>
-              <div id="modeLine" class="modeLine">Manual scoring</div>
-              <div id="modeSub" class="modeSub">No PairPlay match data was detected. You can edit Player A/B names below.</div>
-            </div>
-          </div>
-        </div>
-
         <div class="section">
           <div class="sectionHeader">PLAYERS</div>
           <div class="row">
@@ -774,7 +745,6 @@ body.ppLinked .pairplayReadonlyNote{display:block}
             </div>
             <input id="inNameB" type="text" maxlength="10" inputmode="latin" autocapitalize="none" autocomplete="off" />
           </div>
-          <div class="pairplayReadonlyNote">PairPlay linked mode: player names are supplied by the selected PairPlay match. Use Change Court to swap left/right display if needed.</div>
         </div>
 
         <div class="section">
@@ -1013,11 +983,6 @@ body.ppLinked .pairplayReadonlyNote{display:block}
     try { return JSON.parse(json); } catch(e){ return null; }
   }
   let state = {...defaultState, ...(safeParse(localStorage.getItem(LS_KEY)) || {})};
-
-  // Auto mode: standalone by default; PairPlay linked mode is enabled only by URL parameters.
-  let pairPlayMode = false;
-  let pairPlayInfo = null;
-
   // --------- Bridge for isolated add-ons (read-only state + subscribe) ----------
   const __rsSubs = new Set();
   function __rsNotify(){
@@ -1042,18 +1007,6 @@ body.ppLinked .pairplayReadonlyNote{display:block}
     state.nameB = labelB || 'B';
     updateUI();
   };
-  window.__RallyScore.setPairPlayInfo = (info) => {
-    pairPlayMode = true;
-    pairPlayInfo = info || null;
-    document.body.classList.add('ppLinked');
-    if(info){
-      state.nameA = info.teamALabel || 'A';
-      state.nameB = info.teamBLabel || 'B';
-    }
-    refreshSettingsUI();
-    updateUI();
-  };
-  window.__RallyScore.getMode = () => pairPlayMode ? 'pairplay' : 'standalone';
 
 
 
@@ -1085,9 +1038,6 @@ const btnAMinus = el('btnAMinus');
   // settings inputs
   const inNameA = el('inNameA');
   const inNameB = el('inNameB');
-  const modeBadge = el('modeBadge');
-  const modeLine = el('modeLine');
-  const modeSub = el('modeSub');
   const selPoint = el('selPoint');
   const inCustomPoint = el('inCustomPoint');
   const tgDeuce = el('tgDeuce');
@@ -1521,24 +1471,6 @@ applyFont();
   function refreshSettingsUI(){
     inNameA.value = state.nameA;
     inNameB.value = state.nameB;
-
-    if(modeBadge && modeLine && modeSub){
-      if(pairPlayMode && pairPlayInfo){
-        modeBadge.textContent = 'PairPlay linked mode';
-        modeBadge.classList.remove('standalone');
-        modeLine.textContent = pairPlayInfo.matchLabel || 'PairPlay match detected';
-        modeSub.textContent = (pairPlayInfo.teamALabel || 'Team A') + ' vs ' + (pairPlayInfo.teamBLabel || 'Team B') + '. Player names are read-only in Settings.';
-        inNameA.disabled = true;
-        inNameB.disabled = true;
-      }else{
-        modeBadge.textContent = 'Standalone mode';
-        modeBadge.classList.add('standalone');
-        modeLine.textContent = 'Manual scoring';
-        modeSub.textContent = 'No PairPlay match data was detected. You can edit Player A/B names below.';
-        inNameA.disabled = false;
-        inNameB.disabled = false;
-      }
-    }
 
     const isCustom = (state.pointLimit === 'custom');
     selPoint.value = isCustom ? 'custom' : String(state.pointLimit);
@@ -2183,9 +2115,7 @@ applyFont();
   function applyPairNames(){
     try{
       document.body.classList.add('ppLinked');
-      if(window.__RallyScore && typeof window.__RallyScore.setPairPlayInfo === 'function'){
-        window.__RallyScore.setPairPlayInfo(info);
-      }else if(window.__RallyScore && typeof window.__RallyScore.setPairLabels === 'function'){
+      if(window.__RallyScore && typeof window.__RallyScore.setPairLabels === 'function'){
         window.__RallyScore.setPairLabels(info.teamALabel, info.teamBLabel);
       }else{
         var a = document.getElementById('nameA');
