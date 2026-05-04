@@ -22,9 +22,9 @@
     --border:#000000;
     --border2:#000000;
     --radius:18px;
-    --gap:14px;
-    --barH:48px;
-    --controlsH:72px;
+    --gap:8px;
+    --barH:44px;
+    --controlsH:44px;
     --vh: 1vh; /* replaced by JS for iOS */
   }
   *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
@@ -113,17 +113,18 @@
 
   .scoreArea{
     display:flex;
-    align-items:center;
+    align-items:flex-end;
     justify-content:center;
-    padding: 10px;
+    padding: 0 10px 0;
     user-select:none;
     touch-action: manipulation;
   }
 
   .score{
     font-weight: 800;
-    font-size: 120px; /* display tuned */
+    font-size: 140px; /* display tuned */
     line-height: 1;
+    transform: translateY(20px); /* visually lower digits within score area */
   }
 
   /* Game boxes (center) */
@@ -244,11 +245,11 @@
     min-height: 200px;
   }
   .board.landscape .controls{
-    grid-template-columns: 1fr 120px 1fr;
-    height: 86px;
+    grid-template-columns: 1fr 110px 1fr;
+    height: 46px;
   }
-  .board.landscape .btn{ font-size: 42px; }
-  .board.landscape .colonCell{ font-size: 54px; }
+  .board.landscape .btn{ font-size: 34px; }
+  .board.landscape .colonCell{ font-size: 34px; }
 
   /* ---------- Bottom sheet ---------- */
   .overlay{
@@ -461,18 +462,17 @@
     -webkit-user-select:text;
   }
 
-  /* build tag */
-  .buildTag{
-    position: fixed;
-    left: 12px;
-    bottom: calc(12px + env(safe-area-inset-bottom));
-    z-index: 15;
-    background: rgba(0,0,0,.35);
+  /* build tag: show only inside Settings to avoid interfering with score controls */
+  .buildTag{ display:none !important; }
+  .settingsBuildTag{
+    display:inline-block;
+    margin: 4px 0 8px 0;
+    background: rgba(0,0,0,.28);
     border: 1px solid rgba(255,255,255,.10);
+    color: rgba(255,255,255,.72);
     padding: 6px 10px;
     border-radius: 12px;
     font-size: 12px;
-    opacity:.85;
     user-select:none;
   }
 
@@ -737,13 +737,11 @@ body.ppLinked .pairplayReadonlyNote{display:block}
       </div>
       <div class="controls" id="controls">
         <div class="btn" id="btnAMinus">−</div>
-        <div class="colonCell" id="btnColon" aria-label="Menu">:</div>
+        <div class="colonCell" id="btnColon" aria-label="Menu">⋯</div>
         <div class="btn" id="btnBMinus">−</div>
       </div>
     </div>
   </div>
-
-  <div class="buildTag" id="buildTag">RallyScore408 display-tune</div>
 
   <!-- Bottom sheet -->
   <div class="overlay" id="overlay"></div>
@@ -922,10 +920,10 @@ body.ppLinked .pairplayReadonlyNote{display:block}
           <div class="row">
             <div class="label">
               <div class="title">Score font size</div>
-              <div class="sub">Default 156</div>
+              <div class="sub">Default 240</div>
             </div>
             <div class="inline">
-              <input id="inFontSize" type="number" min="60" max="200" step="1" style="width:120px" />
+              <input id="inFontSize" type="number" min="60" max="260" step="1" style="width:120px" />
               <span style="opacity:.75">pt</span>
             </div>
           </div>
@@ -949,6 +947,8 @@ body.ppLinked .pairplayReadonlyNote{display:block}
             <div class="toggle" id="tgHud" role="switch" aria-checked="false"></div>
           </div>
         </div>
+
+        <div class="settingsBuildTag" id="buildTag">RallyScore412 settings-buildtag</div>
 
       </div>
     </div>
@@ -1013,6 +1013,7 @@ body.ppLinked .pairplayReadonlyNote{display:block}
 
   // --------- State ----------
   const LS_KEY = 'rallyScore.settings.v1';
+  const UI_PRESET_MARK = '__displayTuneV3';
   const defaultState = {
     nameA: 'A',
     nameB: 'B',
@@ -1025,7 +1026,7 @@ body.ppLinked .pairplayReadonlyNote{display:block}
     showGames: true,
     orient: 'auto', // auto|portrait|landscape
     font: 'din', // din|system|digital
-    fontSize: 156,
+    fontSize: 240,
     dotSize: 18,
     colABg: '#000000',
     colAText: '#ffffff',
@@ -1046,7 +1047,12 @@ body.ppLinked .pairplayReadonlyNote{display:block}
   function safeParse(json){
     try { return JSON.parse(json); } catch(e){ return null; }
   }
-  let state = {...defaultState, ...(safeParse(localStorage.getItem(LS_KEY)) || {})};
+  const __savedState = (safeParse(localStorage.getItem(LS_KEY)) || {});
+  let state = {...defaultState, ...__savedState};
+  if(!__savedState[UI_PRESET_MARK]){
+    state.fontSize = 240;
+    state[UI_PRESET_MARK] = true;
+  }
 
   // Auto mode: standalone by default; PairPlay linked mode is enabled only by URL parameters.
   let pairPlayMode = false;
@@ -1214,7 +1220,7 @@ const btnAMinus = el('btnAMinus');
     el('dotB').style.width = el('dotB').style.height = sz + 'px';
   }
   function applyFontSize(){
-    const fs = clamp(state.fontSize, 60, 200);
+    const fs = clamp(state.fontSize, 60, 260);
     scoreA.style.fontSize = fs + 'px';
     scoreB.style.fontSize = fs + 'px';
   }
@@ -1716,7 +1722,7 @@ applyFont();
   selFont.addEventListener('change', () => { state.font = selFont.value; persist(); updateUI(); });
 
   inFontSize.addEventListener('change', () => {
-    state.fontSize = clamp(inFontSize.value, 60, 200);
+    state.fontSize = clamp(inFontSize.value, 60, 260);
     persist(); refreshSettingsUI(); updateUI();
   });
 
