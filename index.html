@@ -11,7 +11,11 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="RallyScore">
 
+<<<<<<< HEAD
 <title>RallyScore406 Auto Mode</title>
+=======
+<title>RallyScore405</title>
+>>>>>>> 568a934fcf587239ac3694edda4a5944f78efefc
 <style>
   :root{
     --bg:#0b0b0c;
@@ -666,6 +670,7 @@ body.ppLinked #nameB{
 }
 body.ppLinked .winDots{flex:0 0 auto;}
 
+<<<<<<< HEAD
 
 
 /* --- Auto mode indicator (RallyScore406_autoMode) --- */
@@ -684,6 +689,8 @@ body.ppLinked #inNameB{opacity:.65;cursor:not-allowed}
 body.ppLinked .pairplayReadonlyNote{display:block}
 .pairplayReadonlyNote{display:none;font-size:12px;color:#94a3b8;margin-top:8px;line-height:1.4}
 
+=======
+>>>>>>> 568a934fcf587239ac3694edda4a5944f78efefc
 </style>
 </head>
 <body>
@@ -713,7 +720,11 @@ body.ppLinked .pairplayReadonlyNote{display:block}
     </div>
   </div>
 
+<<<<<<< HEAD
   <div class="buildTag" id="buildTag">RallyScore406_autoMode</div>
+=======
+  <div class="buildTag" id="buildTag">RallyScore405</div>
+>>>>>>> 568a934fcf587239ac3694edda4a5944f78efefc
 
   <!-- Bottom sheet -->
   <div class="overlay" id="overlay"></div>
@@ -747,6 +758,7 @@ body.ppLinked .pairplayReadonlyNote{display:block}
         Settings
       </div>
       <div class="settingsScroll" id="settingsScroll">
+<<<<<<< HEAD
         <div class="section" id="modeSection">
           <div class="sectionHeader">MODE</div>
           <div class="row">
@@ -758,6 +770,8 @@ body.ppLinked .pairplayReadonlyNote{display:block}
           </div>
         </div>
 
+=======
+>>>>>>> 568a934fcf587239ac3694edda4a5944f78efefc
         <div class="section">
           <div class="sectionHeader">PLAYERS</div>
           <div class="row">
@@ -774,7 +788,10 @@ body.ppLinked .pairplayReadonlyNote{display:block}
             </div>
             <input id="inNameB" type="text" maxlength="10" inputmode="latin" autocapitalize="none" autocomplete="off" />
           </div>
+<<<<<<< HEAD
           <div class="pairplayReadonlyNote">PairPlay linked mode: player names are supplied by the selected PairPlay match. Use Change Court to swap left/right display if needed.</div>
+=======
+>>>>>>> 568a934fcf587239ac3694edda4a5944f78efefc
         </div>
 
         <div class="section">
@@ -1013,11 +1030,14 @@ body.ppLinked .pairplayReadonlyNote{display:block}
     try { return JSON.parse(json); } catch(e){ return null; }
   }
   let state = {...defaultState, ...(safeParse(localStorage.getItem(LS_KEY)) || {})};
+<<<<<<< HEAD
 
   // Auto mode: standalone by default; PairPlay linked mode is enabled only by URL parameters.
   let pairPlayMode = false;
   let pairPlayInfo = null;
 
+=======
+>>>>>>> 568a934fcf587239ac3694edda4a5944f78efefc
   // --------- Bridge for isolated add-ons (read-only state + subscribe) ----------
   const __rsSubs = new Set();
   function __rsNotify(){
@@ -1042,6 +1062,7 @@ body.ppLinked .pairplayReadonlyNote{display:block}
     state.nameB = labelB || 'B';
     updateUI();
   };
+<<<<<<< HEAD
   window.__RallyScore.setPairPlayInfo = (info) => {
     pairPlayMode = true;
     pairPlayInfo = info || null;
@@ -1054,6 +1075,8 @@ body.ppLinked .pairplayReadonlyNote{display:block}
     updateUI();
   };
   window.__RallyScore.getMode = () => pairPlayMode ? 'pairplay' : 'standalone';
+=======
+>>>>>>> 568a934fcf587239ac3694edda4a5944f78efefc
 
 
 
@@ -1085,9 +1108,12 @@ const btnAMinus = el('btnAMinus');
   // settings inputs
   const inNameA = el('inNameA');
   const inNameB = el('inNameB');
+<<<<<<< HEAD
   const modeBadge = el('modeBadge');
   const modeLine = el('modeLine');
   const modeSub = el('modeSub');
+=======
+>>>>>>> 568a934fcf587239ac3694edda4a5944f78efefc
   const selPoint = el('selPoint');
   const inCustomPoint = el('inCustomPoint');
   const tgDeuce = el('tgDeuce');
@@ -1522,6 +1548,7 @@ applyFont();
     inNameA.value = state.nameA;
     inNameB.value = state.nameB;
 
+<<<<<<< HEAD
     if(modeBadge && modeLine && modeSub){
       if(pairPlayMode && pairPlayInfo){
         modeBadge.textContent = 'PairPlay linked mode';
@@ -1540,6 +1567,8 @@ applyFont();
       }
     }
 
+=======
+>>>>>>> 568a934fcf587239ac3694edda4a5944f78efefc
     const isCustom = (state.pointLimit === 'custom');
     selPoint.value = isCustom ? 'custom' : String(state.pointLimit);
     inCustomPoint.style.display = isCustom ? '' : 'none';
@@ -2183,9 +2212,13 @@ applyFont();
   function applyPairNames(){
     try{
       document.body.classList.add('ppLinked');
+<<<<<<< HEAD
       if(window.__RallyScore && typeof window.__RallyScore.setPairPlayInfo === 'function'){
         window.__RallyScore.setPairPlayInfo(info);
       }else if(window.__RallyScore && typeof window.__RallyScore.setPairLabels === 'function'){
+=======
+      if(window.__RallyScore && typeof window.__RallyScore.setPairLabels === 'function'){
+>>>>>>> 568a934fcf587239ac3694edda4a5944f78efefc
         window.__RallyScore.setPairLabels(info.teamALabel, info.teamBLabel);
       }else{
         var a = document.getElementById('nameA');
@@ -2210,4 +2243,8 @@ applyFont();
 
 </body>
 
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> 568a934fcf587239ac3694edda4a5944f78efefc
