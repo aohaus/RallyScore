@@ -1,3 +1,4 @@
+@ -0,0 +1,2267 @@
 <!doctype html>
 <html lang="en">
 <head>
@@ -7,11 +8,11 @@
 <meta name="mobile-web-app-capable" content="yes" />
 
 <link rel="apple-touch-icon" sizes="180x180"
-      href="../Hub/icons/rallyscore-icon-180.png">
+      href="/RallyHub/icons/rallyscore-icon-180.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="RallyScore">
 
-<title>RallyScore406 Auto Mode</title>
+<title>RallyScore406 Auto Mode + Player Defaults</title>
 <style>
   :root{
     --bg:#0b0b0c;
@@ -668,6 +669,36 @@ body.ppLinked .winDots{flex:0 0 auto;}
 
 
 
+
+/* --- Players default button (RallyScore406_autoMode_defaultPlayers) --- */
+.playersDefaultRow{
+  padding:18px 24px 22px;
+  display:flex;
+  justify-content:flex-end;
+  border-top:1px solid rgba(255,255,255,.07);
+}
+.playersDefaultBtn{
+  appearance:none;
+  border:1px solid #475569;
+  background:#334155;
+  color:#e2e8f0;
+  border-radius:14px;
+  padding:12px 16px;
+  font-weight:900;
+  font-size:16px;
+  cursor:pointer;
+}
+.playersDefaultBtn:active{transform:translateY(1px)}
+.playersDefaultHint{
+  color:#94a3b8;
+  font-size:13px;
+  margin-right:auto;
+  align-self:center;
+  padding-right:12px;
+}
+body.ppLinked .playersDefaultHint::after{content:'Restore PairPlay names';}
+body:not(.ppLinked) .playersDefaultHint::after{content:'Restore A / B';}
+
 /* --- Auto mode indicator (RallyScore406_autoMode) --- */
 .modeBadge{
   display:inline-flex;align-items:center;gap:6px;
@@ -713,7 +744,7 @@ body.ppLinked .pairplayReadonlyNote{display:block}
     </div>
   </div>
 
-  <div class="buildTag" id="buildTag">RallyScore406_autoMode</div>
+  <div class="buildTag" id="buildTag">RallyScore406_autoMode_defaultPlayers</div>
 
   <!-- Bottom sheet -->
   <div class="overlay" id="overlay"></div>
@@ -775,6 +806,10 @@ body.ppLinked .pairplayReadonlyNote{display:block}
             <input id="inNameB" type="text" maxlength="10" inputmode="latin" autocapitalize="none" autocomplete="off" />
           </div>
           <div class="pairplayReadonlyNote">PairPlay linked mode: player names are supplied by the selected PairPlay match. Use Change Court to swap left/right display if needed.</div>
+          <div class="playersDefaultRow">
+            <div class="playersDefaultHint" aria-hidden="true"></div>
+            <button class="playersDefaultBtn" type="button" id="btnPlayersDefault">Set to Default</button>
+          </div>
         </div>
 
         <div class="section">
@@ -1085,6 +1120,7 @@ const btnAMinus = el('btnAMinus');
   // settings inputs
   const inNameA = el('inNameA');
   const inNameB = el('inNameB');
+  const btnPlayersDefault = el('btnPlayersDefault');
   const modeBadge = el('modeBadge');
   const modeLine = el('modeLine');
   const modeSub = el('modeSub');
@@ -1513,6 +1549,23 @@ applyFont();
   attachLongPress(el('tapB'), () => { state.server='B'; persist(); updateUI(); log('manual serve -> B'); }, 420);
 
   // --------- Settings bindings ----------
+
+  function restorePlayersToDefault(){
+    if(pairPlayMode && pairPlayInfo){
+      // Return PairPlay-linked names to the original URL-provided side assignment.
+      // Scores/games are intentionally kept as-is; use Change Court when the physical side changes.
+      state.nameA = pairPlayInfo.teamALabel || 'A';
+      state.nameB = pairPlayInfo.teamBLabel || 'B';
+    }else{
+      state.nameA = 'A';
+      state.nameB = 'B';
+    }
+    persist();
+    refreshSettingsUI();
+    updateUI();
+    log('players -> default');
+  }
+
   function setToggle(tg, val){
     tg.classList.toggle('on', !!val);
     tg.setAttribute('aria-checked', !!val);
@@ -1586,6 +1639,8 @@ applyFont();
   bindToggle(tgMatchPoint, 'matchPoint');
   bindToggle(tgGames, 'showGames');
   bindToggle(tgHud, 'hud');
+
+  if(btnPlayersDefault){ btnPlayersDefault.addEventListener('click', restorePlayersToDefault); }
 
   inNameA.addEventListener('input', () => {
     let v = inNameA.value.trim();
