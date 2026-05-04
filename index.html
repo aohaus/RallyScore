@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="RallyScore">
 
-<title>RallyScore406</title>
+<title>RallyScore407</title>
 <style>
   :root{
     --bg:#0b0b0c;
@@ -743,7 +743,7 @@ body.ppLinked .pairplayReadonlyNote{display:block}
     </div>
   </div>
 
-  <div class="buildTag" id="buildTag">RallyScore406</div>
+  <div class="buildTag" id="buildTag">RallyScore407 score-font</div>
 
   <!-- Bottom sheet -->
   <div class="overlay" id="overlay"></div>
@@ -910,12 +910,12 @@ body.ppLinked .pairplayReadonlyNote{display:block}
           <div class="row">
             <div class="label">
               <div class="title">Font family</div>
-              <div class="sub">System / Compact / Rounded</div>
+              <div class="sub">Score numbers only: DIN / System / Digital</div>
             </div>
             <select id="selFont">
-              <option value="system" selected>System</option>
-              <option value="compact">Compact</option>
-              <option value="rounded">Rounded</option>
+              <option value="din" selected>DIN (Default)</option>
+              <option value="system">System</option>
+              <option value="digital">Digital</option>
             </select>
           </div>
 
@@ -1024,7 +1024,7 @@ body.ppLinked .pairplayReadonlyNote{display:block}
     matchPoint: true,
     showGames: true,
     orient: 'auto', // auto|portrait|landscape
-    font: 'system', // system|compact|rounded
+    font: 'din', // din|system|digital
     fontSize: 140,
     dotSize: 18,
     colABg: '#000000',
@@ -1172,11 +1172,30 @@ const btnAMinus = el('btnAMinus');
   }
 
   function applyFont(){
-    const fam =
-      state.font === 'compact' ? 'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif' :
-      state.font === 'rounded' ? 'ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif' :
-      'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif';
-    document.body.style.fontFamily = fam;
+    // Font family setting applies only to the large score numbers.
+    // The rest of the app keeps the original system UI font.
+    let fam;
+
+    if(state.font === 'din'){
+      fam = '"DIN Condensed","Arial Narrow","Roboto Condensed",system-ui,-apple-system,Segoe UI,Roboto,sans-serif';
+    }
+    else if(state.font === 'digital'){
+      fam = '"Courier New","Lucida Console",monospace';
+    }
+    else{
+      fam = 'system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif';
+    }
+
+    scoreA.style.fontFamily = fam;
+    scoreB.style.fontFamily = fam;
+
+    if(state.font === 'digital'){
+      scoreA.style.letterSpacing = '6px';
+      scoreB.style.letterSpacing = '6px';
+    }else{
+      scoreA.style.letterSpacing = '0';
+      scoreB.style.letterSpacing = '0';
+    }
   }
   function applyColors(){
     panelA.style.background = state.colABg;
