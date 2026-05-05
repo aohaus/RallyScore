@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="RallyScore">
 
-<title>RallyScore v2.0.12</title>
+<title>RallyScore v2.1.1</title>
 <style>
   :root{
     --bg:#0b0b0c;
@@ -1105,7 +1105,7 @@ body.ppLinked .pairplayReadonlyNote{display:block}
           </div>
         </div>
 
-        <div class="settingsBuildTag" id="buildTag">RallyScore v2.0.12 header-gradient-tune</div>
+        <div class="settingsBuildTag" id="buildTag">RallyScore v2.1.1 change-court-header-fix</div>
 
       </div>
     </div>
@@ -1508,11 +1508,18 @@ const btnAMinus = el('btnAMinus');
   }
 
   function headerBgFor(side){
-    const p = COLOR_PATTERNS[state.colorPattern] || COLOR_PATTERNS.default;
-    if(side === 'A'){
-      return p.aHeaderBg || darkenHex(state.colABg, .18);
+    // v2.1.1 fix:
+    // Header color must follow the current side color, not the fixed A/B pattern color.
+    // This ensures Change Court swaps player-name header colors together with score panels.
+    const bg = (side === 'A') ? state.colABg : state.colBBg;
+
+    // Default Mono remains slightly lifted from pure black for readability.
+    if(String(bg).toLowerCase() === '#000000'){
+      return '#101117';
     }
-    return p.bHeaderBg || darkenHex(state.colBBg, .18);
+
+    // Keep header much darker than the score panel while preserving its hue.
+    return darkenHex(bg, .58);
   }
 
 
