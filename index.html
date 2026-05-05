@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="RallyScore">
 
-<title>RallyScore407</title>
+<title>RallyScore v2.0.12</title>
 <style>
   :root{
     --bg:#0b0b0c;
@@ -107,14 +107,15 @@
     height: 14px;
     border-radius: 999px;
   }
-  .winDotA{ background: #d72638; } /* red */
-  .winDotB{ background: #1f6feb; } /* blue */
+  .winDotA{ background: #ffffff; } /* unified white */
+  .winDotB{ background: #ffffff; } /* unified white */
 
 
   .scoreArea{
     display:flex;
     align-items:center;
     justify-content:center;
+    position:relative;
     padding: 0 10px 0;
     user-select:none;
     touch-action: manipulation;
@@ -123,8 +124,8 @@
   .score{
     font-weight: 800;
     font-size: 140px; /* display tuned */
-    line-height: 0.92;
-    transform: translateY(12px); /* tuned compromise: slightly lower without creating large top gap */
+    line-height: 1;
+    transform: translateY(18px);
   }
 
   /* Game boxes (center) */
@@ -203,13 +204,14 @@
   .panel.isServer{ filter:none; }
   .panel.isServer .panelHeader{ filter:none; }
   .score{ position:relative; }
-  .panel.isServer .score::after{
+  .panel.isServer .score::after{ content:none; }
+  .panel.isServer .scoreArea::after{
     content:"";
     position:absolute;
     left:7%;
     right:7%;
-    height:0.09em; /* thicker underline */
-    bottom:-0.18em; /* position A: offset under digits (no overlap) */
+    height:10px; /* thick white line */
+    bottom:6px;  /* keep lower spacing fixed while bringing score closer */
     background: currentColor;
     opacity:0.95;
     border-radius:999px;
@@ -485,15 +487,12 @@ html, body {
   touch-action: manipulation;
   overscroll-behavior: none;
 }
-/* Game point highlight (Phase 1): tint score area + name pill (no border emphasis) */
-  .panel.gpA .scoreArea{ background: rgba(90, 140, 210, 0.22); }
-  .panel.gpB .scoreArea{ background: rgba(210, 150, 90, 0.22); }
-
-  /* Strong game point highlight */
-.panel.gpA { background-color: #8b0000 !important; color: #ffffff !important; }
-.panel.gpB { background-color: #0b3c8a !important; color: #ffffff !important; }
-.name.gpA { background-color: #8b0000; color:#fff; }
-.name.gpB { background-color: #0b3c8a; color:#fff; }
+/* Match/Game point highlight v2.0.2: score text only, no background color change */
+  .panel.gpA #scoreA,
+  .panel.gpB #scoreB{
+    color:#ff4d5e !important;
+    text-shadow:0 0 14px rgba(255,77,94,.24);
+  }
 
 
   /* Hide legacy game count boxes (replaced by win dots near player names) */
@@ -714,6 +713,152 @@ body.ppLinked #inNameB{opacity:.65;cursor:not-allowed}
 body.ppLinked .pairplayReadonlyNote{display:block}
 .pairplayReadonlyNote{display:none;font-size:12px;color:#94a3b8;margin-top:8px;line-height:1.4}
 
+
+
+/* --- Color Pattern Picker v2.0.2 --- */
+.themePickerOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.72);
+  display:none;
+  z-index:45;
+  padding:max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right))
+          max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+}
+.themePickerOverlay.open{display:flex;align-items:center;justify-content:center}
+.themePickerCard{
+  width:min(760px, 100%);
+  max-height:calc(100vh - 28px);
+  overflow:auto;
+  background:rgba(18,19,22,.96);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:22px;
+  padding:18px;
+  box-shadow:0 24px 70px rgba(0,0,0,.55);
+}
+.themePickerHead{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:14px;
+}
+.themePickerTitle{font-size:24px;font-weight:950;line-height:1.1}
+.themePickerSub{font-size:13px;color:#94a3b8;margin-top:6px;line-height:1.45}
+.themePickerSkip{
+  background:#334155;
+  border:1px solid #475569;
+  color:#e2e8f0;
+  border-radius:14px;
+  padding:10px 12px;
+  font-weight:900;
+  flex:0 0 auto;
+}
+.themePatternGrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.themePatternCard{
+  border:1px solid rgba(255,255,255,.13);
+  background:rgba(255,255,255,.04);
+  border-radius:18px;
+  padding:12px;
+  text-align:left;
+  cursor:pointer;
+}
+.themePatternCard:active{transform:translateY(1px)}
+.themePatternCard.selected{
+  outline:3px solid rgba(34,197,94,.65);
+  outline-offset:-3px;
+}
+.themePatternName{font-weight:950;font-size:14px;margin-bottom:8px}
+.themePreview{
+  height:88px;
+  border-radius:14px;
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  border:1px solid rgba(255,255,255,.10);
+}
+.themePreviewSide{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-weight:950;
+}
+.themePreviewLabel{font-size:10px;opacity:.75;margin-bottom:3px}
+.themePreviewScore{font-size:34px;line-height:1}
+.themePatternDesc{
+  margin-top:8px;
+  color:#94a3b8;
+  font-size:12px;
+  line-height:1.35;
+}
+@media (max-width:520px){
+  .themePatternGrid{grid-template-columns:1fr}
+  .themePickerTitle{font-size:22px}
+}
+
+
+
+/* --- Reset confirmation dialog v2.0.2 --- */
+.resetConfirmOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.62);
+  display:none;
+  z-index:46;
+  padding:max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right))
+          max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+}
+.resetConfirmOverlay.open{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.resetConfirmCard{
+  width:min(420px, 100%);
+  background:rgba(18,19,22,.98);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:22px;
+  padding:18px;
+  box-shadow:0 24px 70px rgba(0,0,0,.55);
+}
+.resetConfirmTitle{
+  font-size:22px;
+  font-weight:950;
+  margin-bottom:8px;
+}
+.resetConfirmText{
+  color:#94a3b8;
+  font-size:14px;
+  line-height:1.45;
+  margin-bottom:16px;
+}
+.resetConfirmActions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.resetBtn{
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.14);
+  padding:12px 14px;
+  font-size:16px;
+  font-weight:900;
+  color:#e5e7eb;
+  background:#334155;
+}
+.resetBtn.primary{
+  background:#991b1b;
+  border-color:#b91c1c;
+  color:#fff;
+}
+.resetBtn:active{transform:translateY(1px)}
+
 </style>
 </head>
 <body>
@@ -870,6 +1015,18 @@ body.ppLinked .pairplayReadonlyNote{display:block}
           <div class="sectionHeader">COLORS</div>
           <div class="row">
             <div class="label">
+              <div class="title">Color Pattern</div>
+              <div class="sub">Default / Blue Red / Pro / Modern</div>
+            </div>
+            <select id="selColorPattern">
+              <option value="default">Default Mono</option>
+              <option value="blueRed">Blue / Red</option>
+              <option value="navyBurgundy">Navy / Burgundy</option>
+              <option value="tealOrange">Teal / Orange</option>
+            </select>
+          </div>
+          <div class="row">
+            <div class="label">
               <div class="title">Player A colors</div>
               <div class="sub">Background / Text</div>
             </div>
@@ -948,7 +1105,7 @@ body.ppLinked .pairplayReadonlyNote{display:block}
           </div>
         </div>
 
-        <div class="settingsBuildTag" id="buildTag">RallyScore414 score-balance</div>
+        <div class="settingsBuildTag" id="buildTag">RallyScore v2.0.12 header-gradient-tune</div>
 
       </div>
     </div>
@@ -1001,6 +1158,34 @@ body.ppLinked .pairplayReadonlyNote{display:block}
     </div>
   </div>
 
+
+  <!-- Color Pattern Picker v2.0.2 -->
+  <div class="themePickerOverlay" id="themePickerOverlay" role="dialog" aria-modal="true" aria-label="Choose Color Pattern">
+    <div class="themePickerCard">
+      <div class="themePickerHead">
+        <div>
+          <div class="themePickerTitle">Choose Color Pattern</div>
+          <div class="themePickerSub">Default Mono is selected automatically. You can change this later in Settings.</div>
+        </div>
+        <button class="themePickerSkip" type="button" id="themePickerSkip">Use Default</button>
+      </div>
+      <div class="themePatternGrid" id="themePatternGrid"></div>
+    </div>
+  </div>
+
+
+  <!-- Reset Confirmation v2.0.2 -->
+  <div class="resetConfirmOverlay" id="resetConfirmOverlay" role="dialog" aria-modal="true" aria-label="Reset confirmation">
+    <div class="resetConfirmCard">
+      <div class="resetConfirmTitle">Reset this game?</div>
+      <div class="resetConfirmText">Scores, games, and Stats history will be reset. Player names, color pattern, and display settings will be kept.</div>
+      <div class="resetConfirmActions">
+        <button class="resetBtn" type="button" id="resetCancelBtn">Cancel</button>
+        <button class="resetBtn primary" type="button" id="resetYesBtn">Yes, reset</button>
+      </div>
+    </div>
+  </div>
+
 <script>
 (() => {
   // --------- iOS 100vh fix ----------
@@ -1032,6 +1217,8 @@ body.ppLinked .pairplayReadonlyNote{display:block}
     colAText: '#ffffff',
     colBBg: '#000000',
     colBText: '#ffffff',
+    colorPattern: 'default',
+    colorPatternSeen: false,
     hud: false,
     // match state:
     scoreA: 0,
@@ -1140,6 +1327,13 @@ const btnAMinus = el('btnAMinus');
   const colAText = el('colAText');
   const colBBg = el('colBBg');
   const colBText = el('colBText');
+  const selColorPattern = el('selColorPattern');
+  const themePickerOverlay = el('themePickerOverlay');
+  const themePickerGrid = el('themePatternGrid');
+  const themePickerSkip = el('themePickerSkip');
+  const resetConfirmOverlay = el('resetConfirmOverlay');
+  const resetCancelBtn = el('resetCancelBtn');
+  const resetYesBtn = el('resetYesBtn');
   const selOrient = el('selOrient');
   const selFont = el('selFont');
   const inFontSize = el('inFontSize');
@@ -1203,15 +1397,144 @@ const btnAMinus = el('btnAMinus');
       scoreB.style.letterSpacing = '0';
     }
   }
+
+  const COLOR_PATTERNS = {
+    default: {
+      name: 'Default Mono',
+      desc: 'Most readable. Same color on both sides.',
+      aBg: '#000000', aText: '#ffffff', aHeaderBg: '#101117',
+      bBg: '#000000', bText: '#ffffff', bHeaderBg: '#101117'
+    },
+    blueRed: {
+      name: 'Blue / Red',
+      desc: 'High-contrast left/right style.',
+      aBg: '#0D2874', aText: '#ffffff', aHeaderBg: '#0a1d41',
+      bBg: '#7F1121', bText: '#ffffff', bHeaderBg: '#400a13'
+    },
+    navyBurgundy: {
+      name: 'Navy / Burgundy',
+      desc: 'Calm pro-style contrast.',
+      aBg: '#111F4A', aText: '#ffffff', aHeaderBg: '#0a1730',
+      bBg: '#4D1123', bText: '#ffffff', bHeaderBg: '#350a18'
+    },
+    tealOrange: {
+      name: 'Teal / Orange',
+      desc: 'Modern, clear, and playful.',
+      aBg: '#08423E', aText: '#ffffff', aHeaderBg: '#082b26',
+      bBg: '#6E2508', bText: '#ffffff', bHeaderBg: '#3b1405'
+    }
+  };
+
+  function applyColorPattern(patternKey, shouldPersist=true){
+    const key = COLOR_PATTERNS[patternKey] ? patternKey : 'default';
+    const p = COLOR_PATTERNS[key];
+    state.colorPattern = key;
+    state.colABg = p.aBg;
+    state.colAText = p.aText;
+    state.colBBg = p.bBg;
+    state.colBText = p.bText;
+    if(shouldPersist) persist();
+    refreshColorPatternUI();
+    updateUI();
+  }
+
+  function refreshColorPatternUI(){
+    if(selColorPattern) selColorPattern.value = COLOR_PATTERNS[state.colorPattern] ? state.colorPattern : 'default';
+    if(colABg) colABg.value = state.colABg;
+    if(colAText) colAText.value = state.colAText;
+    if(colBBg) colBBg.value = state.colBBg;
+    if(colBText) colBText.value = state.colBText;
+    if(themePickerGrid){
+      themePickerGrid.querySelectorAll('[data-pattern]').forEach(card=>{
+        card.classList.toggle('selected', card.getAttribute('data-pattern') === state.colorPattern);
+      });
+    }
+  }
+
+  function buildThemePicker(){
+    if(!themePickerGrid) return;
+    themePickerGrid.innerHTML = '';
+    ['default','blueRed','navyBurgundy','tealOrange'].forEach(key=>{
+      const p = COLOR_PATTERNS[key];
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'themePatternCard';
+      card.setAttribute('data-pattern', key);
+      card.innerHTML =
+        '<div class="themePatternName">'+p.name+'</div>' +
+        '<div class="themePreview">' +
+          '<div class="themePreviewSide" style="background:'+p.aBg+';color:'+p.aText+'"><div class="themePreviewLabel">A</div><div class="themePreviewScore">15</div></div>' +
+          '<div class="themePreviewSide" style="background:'+p.bBg+';color:'+p.bText+'"><div class="themePreviewLabel">B</div><div class="themePreviewScore">13</div></div>' +
+        '</div>' +
+        '<div class="themePatternDesc">'+p.desc+'</div>';
+      card.addEventListener('click', ()=>{
+        state.colorPatternSeen = true;
+        applyColorPattern(key, true);
+        closeThemePicker();
+      });
+      themePickerGrid.appendChild(card);
+    });
+    refreshColorPatternUI();
+  }
+
+  function openThemePickerIfNeeded(){
+    // PairPlay linked mode should start immediately; Pattern 1 is already applied by default.
+    if(pairPlayMode) return;
+    if(state.colorPatternSeen) return;
+    if(!themePickerOverlay) return;
+    buildThemePicker();
+    themePickerOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeThemePicker(){
+    if(themePickerOverlay) themePickerOverlay.classList.remove('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+
+
+  function darkenHex(hex, factor){
+    try{
+      const raw = String(hex || '#000000').replace('#','').trim();
+      if(raw.length !== 6) return '#050506';
+      const r = Math.max(0, Math.min(255, Math.round(parseInt(raw.slice(0,2),16) * factor)));
+      const g = Math.max(0, Math.min(255, Math.round(parseInt(raw.slice(2,4),16) * factor)));
+      const b = Math.max(0, Math.min(255, Math.round(parseInt(raw.slice(4,6),16) * factor)));
+      return '#' + [r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+    }catch(e){
+      return '#050506';
+    }
+  }
+
+  function headerBgFor(side){
+    const p = COLOR_PATTERNS[state.colorPattern] || COLOR_PATTERNS.default;
+    if(side === 'A'){
+      return p.aHeaderBg || darkenHex(state.colABg, .18);
+    }
+    return p.bHeaderBg || darkenHex(state.colBBg, .18);
+  }
+
+
+  function panelGradient(bg){
+    return `radial-gradient(circle at center,
+      rgba(255,255,255,0.11) 0%,
+      rgba(255,255,255,0.04) 38%,
+      rgba(0,0,0,0.34) 100%
+    ), ${bg}`;
+  }
+
   function applyColors(){
-    panelA.style.background = state.colABg;
+    panelA.style.background = panelGradient(state.colABg);
     panelA.style.color = state.colAText;
-    panelB.style.background = state.colBBg;
+    panelB.style.background = panelGradient(state.colBBg);
     panelB.style.color = state.colBText;
 
-    // Ensure header gradients still look OK on custom colors:
-    panelA.querySelector('.panelHeader').style.background = 'linear-gradient(#0f1012, #050506)';
-    panelB.querySelector('.panelHeader').style.background = 'linear-gradient(#0f1012, #050506)';
+    // Headers follow each side color subtly, but stay very dark for readability.
+    const aHeader = headerBgFor('A');
+    const bHeader = headerBgFor('B');
+    panelA.querySelector('.panelHeader').style.background = `linear-gradient(${aHeader}, rgba(5,5,6,0.5))`;
+    panelB.querySelector('.panelHeader').style.background = `linear-gradient(${bHeader}, rgba(5,5,6,0.5))`;
   }
   function applyDotSize(){
     const sz = clamp(state.dotSize, 8, 40);
@@ -1536,12 +1859,34 @@ applyFont();
     closeSheet();
 });
 // reset with confirmation (sheet)
-  sheetReset.addEventListener('click', () => {
+  function openResetConfirm(){
     closeSheet();
-    if(window.confirm('Reset this game?')){
-      doReset();
+    if(resetConfirmOverlay){
+      resetConfirmOverlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }else{
+      // Fallback
+      if(window.confirm('Reset this game?')) doReset();
     }
-  });
+  }
+  function closeResetConfirm(){
+    if(resetConfirmOverlay) resetConfirmOverlay.classList.remove('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  sheetReset.addEventListener('click', openResetConfirm);
+  if(resetCancelBtn){ resetCancelBtn.addEventListener('click', closeResetConfirm); }
+  if(resetYesBtn){
+    resetYesBtn.addEventListener('click', () => {
+      closeResetConfirm();
+      doReset();
+    });
+  }
+  if(resetConfirmOverlay){
+    resetConfirmOverlay.addEventListener('click', (e) => {
+      if(e.target === resetConfirmOverlay) closeResetConfirm();
+    });
+  }
 
   function doReset(){
     const keepSettings = {
@@ -1553,6 +1898,7 @@ applyFont();
       dotSize: state.dotSize,
       colABg: state.colABg, colAText: state.colAText,
       colBBg: state.colBBg, colBText: state.colBText,
+      colorPattern: state.colorPattern, colorPatternSeen: state.colorPatternSeen,
       hud: state.hud
     };
     state = {...defaultState, ...keepSettings};
@@ -1560,6 +1906,7 @@ applyFont();
     updateUI();
     closeSheet();
     closeSettings();
+    closeResetConfirm();
     log('RESET done');
   }
 
@@ -1634,10 +1981,7 @@ applyFont();
     setToggle(tgMatchPoint, state.matchPoint);
     setToggle(tgGames, state.showGames);
 
-    colABg.value = state.colABg;
-    colAText.value = state.colAText;
-    colBBg.value = state.colBBg;
-    colBText.value = state.colBText;
+    refreshColorPatternUI();
 
     selOrient.value = state.orient;
     selFont.value = state.font;
@@ -1713,10 +2057,33 @@ applyFont();
     persist(); refreshSettingsUI(); updateUI();
   });
 
-  colABg.addEventListener('input', () => { state.colABg = colABg.value; persist(); updateUI(); });
-  colAText.addEventListener('input', () => { state.colAText = colAText.value; persist(); updateUI(); });
-  colBBg.addEventListener('input', () => { state.colBBg = colBBg.value; persist(); updateUI(); });
-  colBText.addEventListener('input', () => { state.colBText = colBText.value; persist(); updateUI(); });
+  if(selColorPattern){
+    selColorPattern.addEventListener('change', () => {
+      state.colorPatternSeen = true;
+      applyColorPattern(selColorPattern.value, true);
+    });
+  }
+  if(themePickerSkip){
+    themePickerSkip.addEventListener('click', () => {
+      state.colorPatternSeen = true;
+      applyColorPattern('default', true);
+      closeThemePicker();
+    });
+  }
+  if(themePickerOverlay){
+    themePickerOverlay.addEventListener('click', (e) => {
+      if(e.target === themePickerOverlay){
+        state.colorPatternSeen = true;
+        applyColorPattern('default', true);
+        closeThemePicker();
+      }
+    });
+  }
+
+  colABg.addEventListener('input', () => { state.colABg = colABg.value; state.colorPattern = 'default'; persist(); refreshColorPatternUI(); updateUI(); });
+  colAText.addEventListener('input', () => { state.colAText = colAText.value; state.colorPattern = 'default'; persist(); refreshColorPatternUI(); updateUI(); });
+  colBBg.addEventListener('input', () => { state.colBBg = colBBg.value; state.colorPattern = 'default'; persist(); refreshColorPatternUI(); updateUI(); });
+  colBText.addEventListener('input', () => { state.colBText = colBText.value; state.colorPattern = 'default'; persist(); refreshColorPatternUI(); updateUI(); });
 
   selOrient.addEventListener('change', () => { state.orient = selOrient.value; persist(); updateUI(); });
   selFont.addEventListener('change', () => { state.font = selFont.value; persist(); updateUI(); });
@@ -1741,7 +2108,9 @@ applyFont();
     // keep as-is; user might want it
   }
   refreshSettingsUI();
+  buildThemePicker();
   updateUI();
+  setTimeout(openThemePickerIfNeeded, 180);
   hudWrap.classList.toggle('on', !!state.hud);
   log('LOAD OK');
 })();
